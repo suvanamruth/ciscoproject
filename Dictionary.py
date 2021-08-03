@@ -13,7 +13,7 @@ import gzip
 import magic
 
 
-
+results = []
 
 def getListOfFiles(dirName):
     '''
@@ -132,51 +132,46 @@ def search(filename, dictionary):
         text = file.read()
         for searchKey in dictionary.keys():
             if searchKey in text:
-                print('String {} found in {}: Metadata: {}'.format(searchKey, filename, dictionary[searchKey]))
-                
+                #print('String {} found in {}: Metadata: {}'.format(searchKey, filename, dictionary[searchKey]))
+                #results.append('String {} found in {}: Metadata: {}'.format(searchKey, filename, dictionary[searchKey]))
+                tuple = (dictionary[searchKey][1], searchKey, filename, dictionary[searchKey][0])
+                results.append(tuple)
             
             
-#inputFileDir = input("File Directory?: ")
-#dictionary = input("Dictionary?: ")
-inputFileDir = "/users/suvanamruth/Desktop/showtech-PE5-processmgr-2021-Jul-22.204246.IST.tgz"
-dictionary = "/users/suvanamruth/Desktop/suvan_dictionary.txt"
-searchDictionary = readDictionary(dictionary)
-
-#y = inputFileDir.rindex("/")
-outputDir = "/users/suvanamruth/Desktop/temp"
-shutil.rmtree(outputDir, ignore_errors=True)
-os.mkdir(outputDir)
 
 
 
 
-#x = inputFileDir.rindex(".")
-#outputDir = inputFileDir[0:x]
-#if os.path.isdir(outputDir):
-#    os.rmdir(outputDir)
-
-#os.mkdir(outputDir)
-extractTarFile(inputFileDir, outputDir)
-print("finished extracting")
-files = getListOfFiles(outputDir)
-print("starting scan")
-for file in files:
-    if os.path.isdir(file):
-        # if this is a directory, skip and move to next file
-        continue
-    if is_tgz_file(file):
-        print('Ignoring tgz file {}'.format(file))
-        continue
-    elif is_gz_file(file):
-        print('Ignoring gz file {}'.format(file))
-        continue
-    elif (os.path.isfile(file) is False):
-        print('Skipping non-file {}'.format(file))
-        continue
-    elif check_if_text_file(file):
-        search(file, searchDictionary)
-    else:
-        continue
 
 
-print("done scanning")
+def mainFunction(inputFileDir, dictionary):
+    searchDictionary = readDictionary(dictionary)
+    index = inputFileDir.rindex("/")
+    outputDir = inputFileDir[0:index + 1] + "temp"
+    shutil.rmtree(outputDir, ignore_errors=True)
+    os.mkdir(outputDir)
+    extractTarFile(inputFileDir, outputDir)
+    print("finished extracting")
+    files = getListOfFiles(outputDir)
+    print("starting scan")
+    for file in files:
+        if os.path.isdir(file):
+            # if this is a directory, skip and move to next file
+            continue
+        if is_tgz_file(file):
+            print('Ignoring tgz file {}'.format(file))
+            continue
+        elif is_gz_file(file):
+            print('Ignoring gz file {}'.format(file))
+            continue
+        elif (os.path.isfile(file) is False):
+            print('Skipping non-file {}'.format(file))
+            continue
+        elif check_if_text_file(file):
+            search(file, searchDictionary)
+        else:
+            continue
+    
+    
+    print("done scanning")
+    
